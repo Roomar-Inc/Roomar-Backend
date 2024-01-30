@@ -31,11 +31,14 @@ const userSchema = new mongoose.Schema({
     },
     gender:{
         type: String, 
-        enum: [Male, Female]
+        enum: ['Male', 'Female']
     },
     photo: String, 
     password: {
-
+        type: String, 
+        required: [true, 'Please provide a password'],
+        minlength: 8,
+        select: false
     },
     phone:{
         type: String,
