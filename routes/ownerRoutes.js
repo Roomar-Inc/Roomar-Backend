@@ -1,7 +1,9 @@
 const express = require('express')
+const upload = require('../config/multerConfig');
+console.log(upload);
 const router = express.Router();
 const postController = require('../controllers/postController');
 
-router.route('/create').post(postController.createPosting);
+router.post('/create', upload.array('image'), postController.createPosting);
 
 module.exports = router;
