@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-
+const bcrypt = require('bcryptjs')
 const userSchema = new mongoose.Schema({
-    firstName: {
-        type: String, 
-        required: [true, 'Please input your firstname'], 
-    },
-    lastName:{
+    // firstName: {
+    //     type: String, 
+    //     required: [true, 'Please input your firstname'], 
+    // },
+    // lastName:{
+    //     type: String, 
+    //     required: [true, 'Please input your lastname']
+    // },
+    name:{
         type: String, 
         required: [true, 'Please input your lastname']
     },
@@ -29,6 +33,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         validate: [validator.isEmail, 'Please provide a valid email']
     },
+    role: {
+        type:String,
+        enum: []
+    },
     gender:{
         type: String, 
         enum: ['Male', 'Female']
@@ -49,6 +57,21 @@ const userSchema = new mongoose.Schema({
     passwordResetExpires: Date
 });
 
-const Owner = mongoose.model('Owner', userSchema)
-    
-module.exports = Owner
+//Hash Password 
+userSchema.pre('save', async function(next){
+    //ONly run this function if password was actually modified
+    if(!this.isModified('password')) return next();
+
+    //Hash the password with cost of 12
+    this.password =  await bcrypt.hash(this.password, 12)
+
+    next();
+});
+
+//Compare password
+userSchema.methods.correctPassword = async function(incomingPassword, storedPassword){
+    return await bcrypt.compare(incomingPassword, storedPassword)
+};
+
+const User = mongoose.model('User', userSchema)
+module.exports = User;
