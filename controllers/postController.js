@@ -15,7 +15,7 @@ exports.createPosting = async (req, res, next ) => {
 //Caretaker's phone number 
 
 cloud(); //call the cloudinary config 
-const {name, address, description, price, type, status} = req.body
+const {name, address, description, price, room_number, type, status} = req.body
 //const {lodge_name, state, lga, community, address, room_number } = req.body;
 const image = req.files
 if(!req.files|| req.files.length === 0){
@@ -35,10 +35,10 @@ try{
         return response.url ; // Modify the response object if needed
   });
 
-  const {results} = await Promise.all(uploads);
-  console.log(results);
-  Post.create({...req.body, ...results});
-  return res.status(200).json(results);
+  const links = await Promise.all(uploads);
+  const post = await Post.create({name, address, description, price, room_number, type, photos: [links]});
+  console.log(post)
+  return res.status(200).json(post);
 }
 catch(err){
     console.log(err)
@@ -46,3 +46,7 @@ catch(err){
 }
 
 }
+
+//Make post unavailable 
+//Add to wishlist
+//
