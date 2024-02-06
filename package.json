@@ -13,7 +13,7 @@
     "validator": "^13.11.0"
   },
   "scripts": {
-    "start": "node server",
+    "start": "npm install --os=linux --cpu=x64 sharp && node server",
     "dev": "nodemon server"
   }
 }
