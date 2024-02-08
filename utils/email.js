@@ -1,19 +1,5 @@
 const nodemailer = require("nodemailer");
 
-// const transporter = nodemailer.createTransport({
-//     service: "SMTP",
-//     host: "smtp-mail.outlook.com",
-//     secureConnection: false,
-//     port: 587,
-//     auth: {
-//         user: process.env.OUTLOOK_USER,
-//         pass: process.env.OUTLOOK_PASSWORD
-//     },
-//     tls: {
-//         ciphers: "SSLv3"
-//     }
-// })
-
 const sendEmail = async (options) => {
 	// 1) Create a transporter
 	const transporter = nodemailer.createTransport({
@@ -26,7 +12,7 @@ const sendEmail = async (options) => {
 
 	//2) Define the email options
 	const mailOptions = {
-		from: "Kilgard <jiggaranch.io>",
+		from: "Roomar",
 		to: options.email,
 		subject: options.subject,
 		text: options.message,

@@ -166,7 +166,6 @@ exports.forgotPassword = async (req, res, next) => {
 		});
 
 		res.status(200).json({
-			status: "success",
 			message: "Token sent to email!",
 		});
 	} catch (err) {
@@ -178,6 +177,25 @@ exports.forgotPassword = async (req, res, next) => {
 			status: "fail",
 			message: err,
 		});
+	}
+};
+
+exports.resetPassword = async (req, res, next) => {
+	try {
+		const hashedToken = crypto.createHash("sha256").update(req.body.otp).digest("hex");
+		const user = await User.findOne({ passwordResetToken: hashedToken });
+
+		if (user.checkOtp()) {
+			return res.status(400).json("Invalid or Expired OTP");
+		}
+
+		user.password = req.body.new_password;
+		user.passwordChangedAt = Date.now();
+		await user.save();
+
+		res.status(200).json(user);
+	} catch (err) {
+		res.status(400).json(err);
 	}
 };
 

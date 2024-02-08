@@ -83,5 +83,11 @@ userSchema.methods.createPasswordResetToken = function () {
 	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 	return resetToken;
 };
+
+userSchema.methods.checkOtp = function () {
+	if (Date.now() > Date.parse(this.passwordResetExpires)) {
+		return true;
+	}
+};
 const User = mongoose.model("User", userSchema);
 module.exports = User;
