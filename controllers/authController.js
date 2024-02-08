@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
+const sendEmail = require("../utils/email");
 
 const createToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -141,4 +142,65 @@ exports.restrictTo = (...roles) => {
 		}
 		next();
 	};
+};
+
+exports.forgotPassword = async (req, res, next) => {
+	// 1) Get user based on posted email
+	const user = await User.findOne({ email: req.body.email });
+	if (!user) {
+		return next(res.status(404).json({ message: "There is no user with this email address" }));
+	}
+	// 2) Generate the random user token
+	const otp = user.createPasswordResetToken();
+	await user.save({ validateBeforeSave: false });
+
+	//3) Send it to user's email
+	//const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+	const message = `Your OTP \n ${otp}.\n If you didn't request this, Please ignore this email!`;
+
+	try {
+		await sendEmail({
+			email: "talk2ubadineke@gmail.com",
+			subject: "Your password reset token (valid for 10min)",
+			message,
+		});
+
+		res.status(200).json({
+			status: "success",
+			message: "Token sent to email!",
+		});
+	} catch (err) {
+		user.passwordResetToken = undefined;
+		user.passwordResetExpires = undefined;
+		await user.save({ validateBeforeSave: false });
+
+		return res.status(200).json({
+			status: "fail",
+			message: err,
+		});
+	}
+};
+
+exports.getProfile = async (req, res, next) => {
+	try {
+		const user = req.user;
+		res.status(200).json(user);
+	} catch (err) {
+		res.status(404).json({ message: err });
+	}
+};
+
+exports.updateProfile = async (req, res, next) => {
+	if (req.body.password || req.body.email) {
+		return res.status(400).json("You can't update your email and your password cant be changed via this route");
+	}
+	try {
+		const user = await User.findByIdAndUpdate(req.user._id, req.body, {
+			new: true,
+			runValidators: true,
+		});
+		res.status(200).json(user);
+	} catch (err) {
+		res.status(404).json({ message: err });
+	}
 };

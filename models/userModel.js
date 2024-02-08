@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema({
 	},
 	role: {
 		type: String,
+		required: [true, "Provide user role"],
 		enum: ["owner", "seeker"],
 	},
 	gender: {
@@ -76,7 +77,7 @@ userSchema.methods.correctPassword = async function (incomingPassword, storedPas
 
 //Create OTP
 userSchema.methods.createPasswordResetToken = function () {
-	const resetToken = Math.floor(Math.random() * 900000 + 100000);
+	const resetToken = String(Math.floor(Math.random() * 900000 + 100000));
 	this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 	//console.log({resetToken}, this.passwordResetToken)
 	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;

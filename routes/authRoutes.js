@@ -8,8 +8,8 @@ const authController = require("../controllers/authController");
 router.post("/login", authController.login);
 router.post("/signup", authController.signup);
 router.post("/password", authController.protect, authController.changePassword);
-router.post("/forgotPassword");
+router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword:token");
 
-router.route("/profile").patch().get();
+router.route("/profile").patch(authController.protect, authController.updateProfile).get(authController.protect, authController.getProfile);
 module.exports = router;
