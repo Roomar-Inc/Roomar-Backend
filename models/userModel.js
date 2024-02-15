@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueValidator = require("mongoose-unique-validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const userSchema = new mongoose.Schema(
@@ -100,6 +101,7 @@ userSchema.methods.checkOtp = function (expiration) {
 		return true;
 	}
 };
-
+userSchema.plugin(uniqueValidator);
 const User = mongoose.model("User", userSchema);
+
 module.exports = User;

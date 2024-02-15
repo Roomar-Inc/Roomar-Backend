@@ -7,7 +7,7 @@ const authController = require("../controllers/authController");
 //router.post('/create', upload.array('photos', 7), postController.createPosting
 router.post("/login", authController.login);
 router.post("/signup", authController.signup);
-router.post("/password", authController.protect, authController.changePassword);
+router.patch("/password", authController.protect, authController.changePassword);
 router.post("/forgotPassword", authController.forgotPassword);
 router.post("/verifyOTP", authController.verifyOTP);
 router.patch("/resetPassword", authController.resetPassword);

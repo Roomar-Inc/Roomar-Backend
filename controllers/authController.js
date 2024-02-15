@@ -120,17 +120,19 @@ exports.changePassword = async (req, res, next) => {
 	// 1) Get user from collection
 	try {
 		const user = await User.findById(req.user._id).select("+password");
+		//console.log(user);
 		//2) Check if POSTed current password is correct
 		if (!(await user.correctPassword(req.body.current_password, user.password))) {
-			return res.status(401).json("Your current password is wrong");
+			return res.status(401).json({
+				status: "fail",
+				message: "Your current password is wrong",
+			});
 		}
 		//3) If so, update Password
 		user.password = req.body.new_password;
 		user.passwordChangedAt = Date.now();
 		await user.save();
-
-		//4) Log user in, send JWT
-		createAndSendToken(user, 200, res);
+		res.status(200).json({ message: "Password successfully changed" });
 	} catch (err) {
 		return res.status(401).json({
 			status: "fail",

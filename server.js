@@ -7,13 +7,9 @@ const swaggerUI = require("swagger-ui-express");
 dotenv.config({ path: "./config.env" });
 
 // Initialize Database
-mongoose
-	.connect(process.env.DB, {
-		useNewUrlParser: true,
-	})
-	.then((con) => {
-		console.log("DB connection successful!");
-	});
+mongoose.connect(process.env.DB).then((con) => {
+	console.log("DB connection successful!");
+});
 
 const port = process.env.PORT || 4000;
 
