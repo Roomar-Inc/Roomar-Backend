@@ -7,13 +7,9 @@ const swaggerUI = require("swagger-ui-express");
 dotenv.config({ path: "./config.env" });
 
 // Initialize Database
-mongoose
-	.connect(process.env.DB, {
-		useNewUrlParser: true,
-	})
-	.then((con) => {
-		console.log("DB connection successful!");
-	});
+mongoose.connect(process.env.DB).then((con) => {
+	console.log("DB connection successful!");
+});
 
 const port = process.env.PORT || 4000;
 
@@ -21,9 +17,9 @@ const options = {
 	definition: {
 		openapi: "3.1.0",
 		info: {
-			title: "Roomar Backend API Documentation",
+			title: "Roomar API Documentation",
 			version: "1.0.0",
-			description: "I'd say more later",
+			description: "Base URL: https://roomar-backend.onrender.com/api/v1",
 		},
 		servers: [
 			{
