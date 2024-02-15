@@ -2,62 +2,72 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const userSchema = new mongoose.Schema({
-	// firstName: {
-	//     type: String,
-	//     required: [true, 'Please input your firstname'],
-	// },
-	// lastName:{
-	//     type: String,
-	//     required: [true, 'Please input your lastname']
-	// },
-	name: {
-		type: String,
-		required: [true, "Please input your lastname"],
-	},
-	username: {
-		type: String,
-		required: [true, "Please input your username"],
-		unique: true,
-		// This removes leading and trailing white spaces
-		validate: {
-			validator: function (value) {
-				// Use a regular expression to check if there are any white spaces
-				return !/\s/.test(value);
-			},
-			message: "Username must not contain white spaces.",
+const userSchema = new mongoose.Schema(
+	{
+		// firstName: {
+		//     type: String,
+		//     required: [true, 'Please input your firstname'],
+		// },
+		// lastName:{
+		//     type: String,
+		//     required: [true, 'Please input your lastname']
+		// },
+		name: {
+			type: String,
+			required: [true, "Please input your fullname"],
 		},
+		username: {
+			type: String,
+			required: [true, "Please input your username"],
+			unique: true,
+			// This removes leading and trailing white spaces
+			validate: {
+				validator: function (value) {
+					// Use a regular expression to check if there are any white spaces
+					return !/\s/.test(value);
+				},
+				message: "Username must not contain white spaces.",
+			},
+		},
+		email: {
+			type: String,
+			required: [true, "Please provide an email address"],
+			unique: true,
+			validate: [validator.isEmail, "Please provide a valid email"],
+		},
+		role: {
+			type: String,
+			required: [true, "Provide user role"],
+			enum: ["owner", "seeker"],
+		},
+		gender: {
+			type: String,
+			enum: ["Male", "Female"],
+		},
+		photo: String,
+		password: {
+			type: String,
+			required: [true, "Please provide a password"],
+			minlength: 8,
+			select: false,
+		},
+		phone: {
+			type: String,
+			required: [true, "Please provide your phone number"],
+		},
+		wishlist: {
+			type: Array,
+		},
+		passwordChangedAt: Date,
+		passwordResetToken: String,
+		passwordResetExpires: Date,
+		otpJwt: String,
+		otpJwtExpires: Date,
 	},
-	email: {
-		type: String,
-		required: [true, "Please provide an email address"],
-		unique: true,
-		validate: [validator.isEmail, "Please provide a valid email"],
-	},
-	role: {
-		type: String,
-		required: [true, "Provide user role"],
-		enum: ["owner", "seeker"],
-	},
-	gender: {
-		type: String,
-		enum: ["Male", "Female"],
-	},
-	photo: String,
-	password: {
-		type: String,
-		required: [true, "Please provide a password"],
-		minlength: 8,
-		select: false,
-	},
-	phone: {
-		type: String,
-		required: [true, "Please provide your phone number"],
-	},
-	passwordChangedAt: Date,
-	passwordResetToken: String,
-	passwordResetExpires: Date,
-});
+	{
+		timestamps: true,
+	}
+);
 
 //Hash Password
 userSchema.pre("save", async function (next) {
@@ -84,10 +94,12 @@ userSchema.methods.createPasswordResetToken = function () {
 	return resetToken;
 };
 
-userSchema.methods.checkOtp = function () {
-	if (Date.now() > Date.parse(this.passwordResetExpires)) {
+//Check if OTP has expired
+userSchema.methods.checkOtp = function (expiration) {
+	if (Date.now() > Date.parse(expiration)) {
 		return true;
 	}
 };
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;

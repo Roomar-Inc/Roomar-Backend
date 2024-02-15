@@ -4,7 +4,7 @@ const router = express.Router();
 const postController = require("../controllers/postController");
 const authController = require("../controllers/authController");
 
-router.post("/create", authController.protect, upload.array("photos", 7), postController.createPost);
+router.post("/create", authController.protect, authController.restrictTo, upload.array("photos", 7), postController.createPost);
 //Update and Delete
 
 router

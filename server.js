@@ -21,9 +21,9 @@ const options = {
 	definition: {
 		openapi: "3.1.0",
 		info: {
-			title: "Roomar Backend API Documentation",
+			title: "Roomar API Documentation",
 			version: "1.0.0",
-			description: "I'd say more later",
+			description: "Base URL: https://roomar-backend.onrender.com/api/v1",
 		},
 		servers: [
 			{
