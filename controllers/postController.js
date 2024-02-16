@@ -111,5 +111,35 @@ exports.getUserPosts = async (req, res, next) => {
 	}
 };
 
+exports.getAllPosts = async (req, res, next) => {
+	try {
+		if (req.query.page === 0 || req.query.page < 0) {
+			return res.status(404).json({ Error: "Not a vaild page range" });
+		}
+		//paginate
+		const totalPosts = await Post.countDocuments();
+		const itemsPerPage = 15;
+		const total_pages = Math.ceil(totalPosts / itemsPerPage);
+		const page = parseInt(req.query.page) || 1;
+		const skip = (page - 1) * itemsPerPage;
+		const posts = await Post.find().skip(skip).limit(itemsPerPage);
+		if (skip >= totalPosts) {
+			return res.status(400).json({ Eroor: "This page does not exist " });
+		}
+		res.status(200).json({
+			data: {
+				total_pages,
+				page,
+				results: posts.length,
+				posts,
+			},
+		});
+	} catch (err) {
+		res.status(404).json({ error: "Post not found", err });
+	}
+};
+
 //User profile
 //Add to wishlist
+//Filter by Furnished, Unfurnished, Eziobodo, Umuchima, Ihiagwa
+//Search by keyword

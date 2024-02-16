@@ -68,6 +68,38 @@
  * tags:
  *   name: Property Postings
  *   description:
+ * /:
+ *   get:
+ *    summary: Retrieve all Posts from DB
+ *    description: Paginated, returns 15 posts per page, add the page no. to the query params **i.e /?page=3**. Without specifying page or even page 1, it outputs the first 15 elements in the db
+ *    tags: [Posts]
+ *    parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: A particular page amongst the already divided sections of the posts in the db
+ *    responses:
+ *       '200':
+ *        description: Retrieved successfully
+ *        content:
+ *          application/json:
+ *            example:
+ *              total_pages: 4
+ *              page: 1
+ *              results: 15
+ *              posts: 
+ *                 _id: 65bfa0026fa212499ec8628b
+ *                 user_id: 65be5b7d5bcc186da231999f
+ *                 name: Akusom Lodge
+ *                 address: Behind Three Threes, Opposite Adanna
+ *                 location: Eziobodo
+ *                 description: Clean but with troublesome caretaker
+ *                 price: 150,000
+ *                 type: Unfurnished
+ *                 status: Available
+ *                 photos: []
+ * 
  * /create:
  *   post:
  *     summary: Create and upload a post
@@ -78,7 +110,7 @@
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Post'
- *
+
  * /post/{post_id}:
  *   get:
  *      summary: Get a post by its id
