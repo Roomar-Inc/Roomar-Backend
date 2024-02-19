@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../controllers/authController");
+const postController = require("../controllers/postController");
+const { addToWishlist, viewWishlist, deleteFromWishlist } = require("../controllers/userController");
 
-router
-	.route("/wishlist")
-	.post(authController.protect, postController.addtoWishlist)
-	.get(authController.protect, postController.getWishlist)
-	.delete(authController.protect, postController.deleteWishlist);
+router.route("/wishlist/:id").patch(protect, addToWishlist).get(protect, viewWishlist).delete(protect, deleteFromWishlist);
 
 module.exports = router;
