@@ -15,4 +15,5 @@ router
 
 router.route("/posts").get(authController.protect, authController.restrictTo("owner"), postController.getUserPosts);
 router.route("/").get(postController.getAllPosts);
+router.route("/search").get(postController.search);
 module.exports = router;

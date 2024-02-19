@@ -4,7 +4,8 @@ const Post = require("../models/postModel");
 const cloudinary = require("cloudinary").v2;
 const cloud = require("../config/cloudinaryConfig"); //import cloud config
 //const upload = require('../config/multerConfig')
-
+const searchPosts = require("../utils/query");
+const paginate = require("../utils/paginate");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
@@ -113,21 +114,45 @@ exports.getUserPosts = async (req, res, next) => {
 
 exports.getAllPosts = async (req, res, next) => {
 	try {
+		//Filtering
+		//type-
+		//location
+		//status
+		//price
+		const queryObj = { ...req.query };
+		const excludedFields = ["page", "sort", "limit", "fields"];
+		excludedFields.forEach((el) => delete queryObj[el]);
+
+		let query;
+
+		if (Object.keys(queryObj).length > 0) {
+			query = Post.find(queryObj);
+		} else {
+			query = Post.find();
+		}
+
 		if (req.query.page === 0 || req.query.page < 0) {
 			return res.status(404).json({ Error: "Not a vaild page range" });
 		}
-		//paginate
-		const totalPosts = await Post.countDocuments();
+		const totalPostsCount = await Post.countDocuments(queryObj);
+		//Paginate
 		const itemsPerPage = 15;
-		const total_pages = Math.ceil(totalPosts / itemsPerPage);
 		const page = parseInt(req.query.page) || 1;
 		const skip = (page - 1) * itemsPerPage;
-		const posts = await Post.find().skip(skip).limit(itemsPerPage);
-		if (skip >= totalPosts) {
-			return res.status(400).json({ Eroor: "This page does not exist " });
+		query = query.skip(skip).limit(itemsPerPage);
+		const posts = await query;
+		if (!posts) return res.status(404).json({ Error: "No posts" });
+		let total_pages;
+		if (totalPostsCount !== 0 && itemsPerPage > totalPostsCount) {
+			total_pages = 1;
+		} else total_pages = Math.ceil(totalPostsCount / itemsPerPage);
+		if (skip >= totalPostsCount) {
+			return res.status(400).json({ Error: "This page does not exist " });
 		}
+
 		res.status(200).json({
 			data: {
+				total_posts: totalPostsCount,
 				total_pages,
 				page,
 				results: posts.length,
@@ -139,6 +164,26 @@ exports.getAllPosts = async (req, res, next) => {
 	}
 };
 
+exports.search = async (req, res, next) => {
+	try {
+		const DB = process.env.DB;
+		const { s } = req.query;
+		const items = await searchPosts(DB, s);
+		if (!items) return res.status(404).json({ message: "No Posts" });
+		const [totalPostsCount, total_pages, page, posts] = await paginate(req, res, items);
+		//console.log(total_pages, posts.length, page);
+		res.status(200).json({
+			data: {
+				total_posts: totalPostsCount,
+				total_pages,
+				page,
+				posts,
+			},
+		});
+	} catch (err) {
+		res.status(404).json({ Error: "Item not found" });
+	}
+};
 //User profile
 //Add to wishlist
 //Filter by Furnished, Unfurnished, Eziobodo, Umuchima, Ihiagwa
