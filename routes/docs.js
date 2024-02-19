@@ -110,6 +110,7 @@
  *           schema:
  *             $ref: '#/components/schemas/Post'
  *
+<<<<<<< HEAD
  * /search:
  *   get:
  *    summary: Search by name
@@ -138,6 +139,8 @@
  *                 photos: []
  *
  *
+=======
+>>>>>>> 79b2994d89d91a08ebb74c36b52e7a1678c33caf
  * /post/{post_id}:
  *   get:
  *      summary: Get a post by its id

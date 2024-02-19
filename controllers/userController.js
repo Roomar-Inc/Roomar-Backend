@@ -6,7 +6,13 @@
 //Delete your comment
 
 //Add to Wishlist
-exports.addtoWishlist = async (req, res, next) => {};
+exports.addtoWishlist = async (req, res, next) => {
+	//Get user id
+	const user = await User.findById(req.user.id);
+	// Get post id
+	// Save to wishlist
+	//Create an array in the user schema for wishlist and add the post id to it
+};
 
 //View Wishlist
 exports.viewWishlist = async (req, res, next) => {};
