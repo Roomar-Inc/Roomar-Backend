@@ -66,8 +66,6 @@
  *             type: string
  *
  * tags:
- *   name: Property Postings
- *   description:
  * /:
  *   get:
  *    summary: Retrieve all Posts from DB
@@ -85,10 +83,11 @@
  *        content:
  *          application/json:
  *            example:
+ *              total_posts: 55
  *              total_pages: 4
  *              page: 1
  *              results: 15
- *              posts: 
+ *              posts:
  *                 _id: 65bfa0026fa212499ec8628b
  *                 user_id: 65be5b7d5bcc186da231999f
  *                 name: Akusom Lodge
@@ -99,7 +98,7 @@
  *                 type: Unfurnished
  *                 status: Available
  *                 photos: []
- * 
+ *
  * /create:
  *   post:
  *     summary: Create and upload a post
@@ -110,7 +109,35 @@
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Post'
-
+ *
+ * /search:
+ *   get:
+ *    summary: Search by name
+ *    description: search based on given expression, paginated to 15 per page, takes in the search expression with parameter "s", **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry, apply **page** parameter, **i.e ?page=2**, but by default it returns the first page which must not be explicitly stated
+ *    tags: [Posts]
+ *    responses:
+ *       '200':
+ *        description: Search successfully
+ *        content:
+ *          application/json:
+ *            example:
+ *              total_posts: 3
+ *              total_pages: 1
+ *              page: 1
+ *              results: 3
+ *              posts:
+ *                 _id: 65bfa0026fa212499ec8628b
+ *                 user_id: 65be5b7d5bcc186da231999f
+ *                 name: Akusom Lodge
+ *                 address: Behind Three Threes, Opposite Adanna
+ *                 location: Eziobodo
+ *                 description: Clean but with troublesome caretaker
+ *                 price: 150,000
+ *                 type: Unfurnished
+ *                 status: Available
+ *                 photos: []
+ *
+ *
  * /post/{post_id}:
  *   get:
  *      summary: Get a post by its id
