@@ -115,6 +115,17 @@
  *    summary: Search by name
  *    description: search based on given expression, paginated to 15 per page, takes in the search expression with parameter "s", **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry, apply **page** parameter, **i.e ?page=2**, but by default it returns the first page which must not be explicitly stated
  *    tags: [Posts]
+ *    parameters:
+ *       - in: query
+ *         name: s
+ *         schema:
+ *           type: string
+ *         description: Expression to search for
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: page/part of the document to be returned. Remember one page contains 15 items
  *    responses:
  *       '200':
  *        description: Search successfully
