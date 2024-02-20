@@ -9,7 +9,7 @@ const { regularPaginate, queryPaginate } = require("../utils/paginate");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
-		const { name, address, description, price, room_number, type, status } = req.body;
+		const { name, address, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).json({ error: "No images uploaded" });
@@ -28,15 +28,19 @@ exports.createPost = async (req, res, next) => {
 			user_id: req.user._id,
 			name,
 			address,
+			contact,
 			description,
 			price,
 			room_number,
 			type,
-			photos: [links],
+			photos: links,
 		});
-		return res.status(201).json(post);
+		return res.status(201).json({
+			data: {
+				post,
+			},
+		});
 	} catch (err) {
-		console.log(err);
 		return res.status(400).json({ Error: err });
 	}
 };
@@ -51,14 +55,13 @@ exports.deletePost = async (req, res) => {
 			return res.status(403).json({ error: "Can't perform action! You don't own this post" });
 		}
 
-		const links = post.photos[0];
+		const links = post.photos;
 		const assetId = [];
 		for (const i of links) {
 			const parts = i.split(/[/\.]/);
 			const str = parts[parts.length - 2];
 			assetId.push(str);
 		}
-		console.log(assetId);
 
 		cloud(); //cloudinary config
 		for (const i of assetId) {
@@ -104,49 +107,60 @@ exports.getPost = async (req, res, next) => {
 //Get All Post Based on a User
 exports.getUserPosts = async (req, res, next) => {
 	try {
-		const posts = await Post.find({ user_id: req.user._id });
-		res.status(200).json(posts);
+		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 });
+		if (!docs) return res.status(404).json({ error: "No posts from this user" });
+		const [totalPostsCount, total_pages, page, posts] = await regularPaginate(req, res, docs);
+		res.status(200).json({
+			data: {
+				total_posts: totalPostsCount,
+				total_pages,
+				page,
+				results: posts.length,
+				posts,
+			},
+		});
 	} catch (err) {
-		res.status(404).json({ error: "No posts from this user" });
+		res.status(404).json({ error: "Error retrieving posts. Try again!" });
 	}
 };
 
 exports.getAllPosts = async (req, res, next) => {
-	// try {
-	//Filtering
-	//type-
-	//location
-	//status
-	//price
-	const queryObj = { ...req.query };
-	const excludedFields = ["page", "sort", "limit", "fields"];
-	excludedFields.forEach((el) => delete queryObj[el]);
+	try {
+		//Filtering
+		//type-
+		//location
+		//status
+		//price
+		const queryObj = { ...req.query };
+		const excludedFields = ["page", "sort", "limit", "fields"];
+		excludedFields.forEach((el) => delete queryObj[el]);
 
-	let query;
+		let query;
 
-	if (Object.keys(queryObj).length > 0) {
-		query = Post.find(queryObj);
-	} else {
-		query = Post.find();
+		//Checks if there are filter fields
+		if (Object.keys(queryObj).length > 0) {
+			query = Post.find(queryObj).sort({ createdAt: -1 });
+		} else {
+			query = Post.find().sort({ createdAt: -1 });
+		}
+
+		if (req.query.page === 0 || req.query.page < 0) {
+			return res.status(404).json({ Error: "Not a vaild page range" });
+		}
+		const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
+
+		res.status(200).json({
+			data: {
+				total_posts: totalPostsCount,
+				total_pages,
+				page,
+				results: posts.length,
+				posts,
+			},
+		});
+	} catch (err) {
+		res.status(404).json({ error: "Post not found", err });
 	}
-
-	if (req.query.page === 0 || req.query.page < 0) {
-		return res.status(404).json({ Error: "Not a vaild page range" });
-	}
-	const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
-
-	res.status(200).json({
-		data: {
-			total_posts: totalPostsCount,
-			total_pages,
-			page,
-			results: posts.length,
-			posts,
-		},
-	});
-	// } catch (err) {
-	// 	res.status(404).json({ error: "Post not found", err });
-	// }
 };
 
 exports.search = async (req, res, next) => {
