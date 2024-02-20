@@ -4,6 +4,7 @@ const { protect } = require("../controllers/authController");
 const postController = require("../controllers/postController");
 const { addToWishlist, viewWishlist, deleteFromWishlist } = require("../controllers/userController");
 
-router.route("/wishlist/:id").patch(protect, addToWishlist).get(protect, viewWishlist).delete(protect, deleteFromWishlist);
+router.route("/wishlist").get(protect, viewWishlist);
+router.route("/wishlist/:id").patch(protect, addToWishlist).delete(protect, deleteFromWishlist);
 
 module.exports = router;

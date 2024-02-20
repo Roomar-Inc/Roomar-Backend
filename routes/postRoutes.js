@@ -4,7 +4,7 @@ const router = express.Router();
 const postController = require("../controllers/postController");
 const authController = require("../controllers/authController");
 
-router.post("/create", authController.protect, authController.restrictTo("owner"), upload.array("photos", 7), postController.createPost);
+router.post("/post", authController.protect, upload.array("photos", 7), postController.createPost);
 //Update and Delete
 
 router
@@ -13,7 +13,7 @@ router
 	.patch(authController.protect, authController.restrictTo("owner"), postController.updatePost)
 	.get(authController.protect, postController.getPost);
 
-router.route("/posts").get(authController.protect, authController.restrictTo("owner"), postController.getUserPosts);
+router.route("/posts").get(authController.protect, postController.getUserPosts);
 router.route("/").get(postController.getAllPosts);
 router.route("/search").get(postController.search);
 module.exports = router;

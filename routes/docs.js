@@ -10,7 +10,7 @@
  *         - address
  *         - price
  *         - type
- *         - status
+ *         - contact
  *         - photos
  *         - author
  *         - finished
@@ -27,14 +27,26 @@
  *         price:
  *           type: number
  *           description: Price of the property
- *         status:
- *           type: string
- *           enum: [Available, Unavailable]
- *           default: 'Available'
- *           description: Choose between Available and Unavailable
+ *         room_no:
+ *           type: number
+ *           description: Room Number
  *         photos:
  *           type: array
  *           description: Max of 7
+ *         type:
+ *           type: string
+ *           enum: [furnished, unfurnished]
+ *           default: unfurnished
+ *           description: Choose between furnished or unfurnished
+ *         contact: 
+ *           type: string
+ *           description: leaser's/Seller's contact
+ *         status:
+ *           type: string
+ *           enum: [available, unavailable]
+ *           default: 'available'
+ *           description: Choose between Available and Unavailable
+
  *
  *     User:
  *        type: object
@@ -99,7 +111,7 @@
  *                 status: Available
  *                 photos: []
  *
- * /create:
+ * /post:
  *   post:
  *     summary: Create and upload a post
  *     tags: [Posts]
@@ -108,24 +120,32 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Post'
+ *             $ref: '#/components/schemas/Post' 
+ *     responses:
+ *       '200':
+ *        description: Created successfully
+ *        content:
+ *          application/json:
+ *            example:
+ *              post:
+ *               user_id: 65ce1a4706af50797f434380
+ *               name: Kwechiri Lodge
+ *               address: Behind Three Trees, opposite Adanna
+ *               contact: 09123748923
+ *               description: Clean but with troublesome caretaker
+ *               price: 150000
+ *               type: furnished
+ *               status: available
+ *               photos:
+ *                 http://res.cloudinary.com/dufy5hiis/image/upload/v1708440983/vo67ojk0auihzfawors5.webp
+ *                 http://res.cloudinary.com/dufy5hiis/image/upload/v1708440982/jv4eltxvcv1lhimhcuuo.webp
+ *               _id: 65d4bd90e8eb8f58a50c08c7
  *
  * /search:
  *   get:
  *    summary: Search by name
- *    description: search based on given expression, paginated to 15 per page, takes in the search expression with parameter "s", **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry, apply **page** parameter, **i.e ?page=2**, but by default it returns the first page which must not be explicitly stated
+ *    description: search based on given expression paginated to 15 per page, takes in the search expression with parameter s, **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry, apply **page** parameter, **i.e ?page=2**, but by default it returns the first page which must not be explicitly stated
  *    tags: [Posts]
- *    parameters:
- *       - in: query
- *         name: s
- *         schema:
- *           type: string
- *         description: Expression to search for
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: page/part of the document to be returned. Remember one page contains 15 items
  *    responses:
  *       '200':
  *        description: Search successfully
@@ -170,9 +190,29 @@
  * /posts:
  *   get:
  *      summary: Get posts
- *      description: Get all posts of the authenticated user
+ *      description: Get all posts of the authenticated user, paginated and sorted 
  *      tags: [Posts]
  *
+ * /wishlist/{post_id}:
+ *   patch:
+ *      summary: Add post to wishlist
+ *      description: Send post id as request param
+ *      tags: [Posts]
+ *      responses:
+ *       '201':
+ *        description: Added Successfully
+ *        content:
+ *          application/json:
+ *            example:
+ *              message: Add to wishlist successful
+ *
+ *   delete:
+ *      summary: Delete from wishlist
+ *      description: Send post id as request param
+ *      tags: [Posts]
+ *      responses:
+ *        '204':
+ *          description: Deleted successfully
  *
  * /signup:
  *   post:
@@ -198,7 +238,7 @@
  *               username: AdLan
  *               email: adrrylane@gmail.com
  *               role: seeker
- *               phone: "091332891232"
+ *               phone: 091332891232
  *               wishlist: []
  *               passwordChangedAt: 2024-02-15T00:19:21.060Z
  *               _id: 65cd58891af01039edf55634
@@ -249,7 +289,7 @@
  *               username: AdLan
  *               email: adrrylane@gmail.com
  *               role: seeker
- *               phone: "091332891232"
+ *               phone: 091332891232
  *               wishlist: []
  *               passwordChangedAt: 2024-02-15T00:19:21.060Z
  *               _id: 65cd58891af01039edf55634
@@ -351,7 +391,7 @@
  *               username: AdLan
  *               email: adrrylane@gmail.com
  *               role: seeker
- *               phone: "091332891232"
+ *               phone: 091332891232
  *               wishlist: []
  *               passwordChangedAt: 2024-02-15T00:19:21.060Z
  *               _id: 65cd58891af01039edf55634
