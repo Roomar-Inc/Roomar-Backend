@@ -10,9 +10,10 @@ exports.createPost = async (req, res, next) => {
 		cloud(); //call the cloudinary config
 		const { name, address, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
-		if (!req.files || req.files.length === 0) {
-			return res.status(400).json({ error: "No images uploaded" });
-		}
+		console.log(req.files);
+		// if (!req.files || req.files.length === 0) {
+		// 	return res.status(400).json({ error: "No images uploaded" });
+		// }
 
 		const uploads = req.files.map(async (file) => {
 			const compressedBuffer = await sharp(file.buffer).webp().resize(450, 450, "contain").webp({ compressionLevel: 9 }).toBuffer();
@@ -106,25 +107,6 @@ exports.getPost = async (req, res, next) => {
 //Get All Post Based on a User
 exports.getUserPosts = async (req, res, next) => {
 	try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 });
-		if (!docs) return res.status(404).json({ error: "No posts from this user" });
-		const [totalPostsCount, total_pages, page, posts] = await regularPaginate(req, res, docs);
-		res.status(200).json({
-			data: {
-				total_posts: totalPostsCount,
-				total_pages,
-				page,
-				results: posts.length,
-				posts,
-			},
-		});
-	} catch (err) {
-		res.status(404).json({ error: "Error retrieving posts. Try again!" });
-=======
-=======
->>>>>>> backend
 		const page = req.query.page * 1 || 1;
 		const limit = req.query.limit * 1 || 15;
 		const skip = (page - 1) * limit;
@@ -148,50 +130,11 @@ exports.getUserPosts = async (req, res, next) => {
 		});
 	} catch (err) {
 		return res.status(404).json({ error: "Error retrieving posts. Try again!" });
-<<<<<<< HEAD
->>>>>>> backend
-=======
->>>>>>> backend
 	}
 };
 
 exports.getAllPosts = async (req, res, next) => {
 	try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-		//Filtering
-		//type-
-		//location
-		//status
-		//price
-		const queryObj = { ...req.query };
-		const excludedFields = ["page", "sort", "limit", "fields"];
-		excludedFields.forEach((el) => delete queryObj[el]);
-
-		let query;
-
-		//Checks if there are filter fields
-		if (Object.keys(queryObj).length > 0) {
-			query = Post.find(queryObj).sort({ createdAt: -1 });
-		} else {
-			query = Post.find().sort({ createdAt: -1 });
-		}
-
-		if (req.query.page === 0 || req.query.page < 0) {
-			return res.status(404).json({ Error: "Not a vaild page range" });
-		}
-		const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
-
-		res.status(200).json({
-			data: {
-				total_posts: totalPostsCount,
-				total_pages,
-				page,
-				results: posts.length,
-				posts,
-=======
-=======
->>>>>>> backend
 		//Filter by type,location, status, price
 		const page = parseInt(req.query.page) * 1 || 1;
 		const limit = req.query.limit * 1 || 15;
@@ -200,7 +143,6 @@ exports.getAllPosts = async (req, res, next) => {
 
 		let pages;
 		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
-<<<<<<< HEAD
 
 		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
 
@@ -220,31 +162,7 @@ exports.getAllPosts = async (req, res, next) => {
 		if (req.query.page === 0 || req.query.page < 0) {
 			return res.status(404).json({ Error: "Not a vaild page range" });
 		}
-		//const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
 
-=======
-
-		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
-
-		const queryObj = { ...req.query };
-		const excludedFields = ["page", "sort", "limit", "fields"];
-		excludedFields.forEach((el) => delete queryObj[el]);
-
-		let query;
-
-		//Checks if there are filter fields
-		if (Object.keys(queryObj).length > 0) {
-			query = Post.find(queryObj).sort({ createdAt: -1 }).skip(skip).limit(limit);
-		} else {
-			query = Post.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
-		}
-
-		if (req.query.page === 0 || req.query.page < 0) {
-			return res.status(404).json({ Error: "Not a vaild page range" });
-		}
-		//const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
-
->>>>>>> backend
 		//pagination
 		res.status(200).json({
 			data: {
@@ -252,10 +170,6 @@ exports.getAllPosts = async (req, res, next) => {
 				pages,
 				page,
 				docs,
-<<<<<<< HEAD
->>>>>>> backend
-=======
->>>>>>> backend
 			},
 		});
 	} catch (err) {
