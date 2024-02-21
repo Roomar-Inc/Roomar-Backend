@@ -1,8 +1,5 @@
 const User = require("../models/userModel");
 const Post = require("../models/postModel");
-//Add to wishlist -post
-//View wishlist -get
-//Delete from wishlist - delete
 
 //Comment on post
 //Delete your comment
@@ -10,59 +7,57 @@ const Post = require("../models/postModel");
 //Add to Wishlist
 exports.addToWishlist = async (req, res, next) => {
 	try {
-		const user = await User.findById(req.user._id);
-		//Get user id
-		const postId = req.params.id;
-		if (user.wishlist.includes(postId)) {
-			return res.status(409).json({ Error: "Post already exists in wishlist" });
-		}
-		user.wishlist.push(postId);
-		await user.save();
+		const user = await User.findByIdAndUpdate(req.user._id, { $addToSet: { wishlist: req.params.id } }, { new: true });
+
 		res.status(201).json({
 			message: "Add to wishlist successful",
 		});
 	} catch (err) {
 		res.status(400).json({ Error: "Error adding to wishlist, try again " });
 	}
-
-	// Get post id
-	// Save/Push to wishlist
-	//Create an array in the user schema for wishlist and add the post id to it
 };
 
 //View Wishlist
 exports.viewWishlist = async (req, res, next) => {
-	const user = await User.findById(req.user._id);
-	//retrieve user id and the wishlist array
-	//loop, check for the ids in the Posts and return
-	// Find the user by ID
+	try {
+		const user = await User.findById(req.user._id);
+		const postIds = user.wishlist;
+		//pagination
+		const page = parseInt(req.query.page) * 1 || 1;
+		const limit = req.query.limit * 1 || 15;
+		const skip = (page - 1) * limit;
+		const total = await Post.countDocuments({ _id: { $in: postIds } });
 
-	// Get the post IDs from the user's wishlist
-	const postIds = user.wishlist;
+		let pages;
+		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
+		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
 
-	// Find the posts with the IDs in the wishlist
-	const docs = await Post.find({ _id: { $in: postIds } });
-	const [totalPostsCount, total_pages, page, posts] = await regularPaginate(req, res, docs);
-	// Now 'posts' contains the full details of the posts in the user's wishlist
-	res.status(200).json({
-		data: {
-			posts,
-		},
-	});
+		const docs = await Post.find({ _id: { $in: postIds } })
+			.skip(skip)
+			.limit(limit);
+
+		res.status(200).json({
+			data: {
+				total,
+				pages,
+				page,
+				docs,
+			},
+		});
+	} catch (err) {
+		res.status(500).json({ Error: "Error fetching wishlist" });
+	}
 };
 
 //Delete from Wishlist
 exports.deleteFromWishlist = async (req, res, next) => {
 	try {
-		const user = await User.findById(req.user._id);
-		const postId = req.params.id.toString();
-		let index;
-		if (user.wishlist.includes(postId)) {
-			index = user.wishlist.indexOf(postId);
-		} else return res.status(404).json({ message: "Post not found" });
-		user.wishlist.splice(index, 1);
-		await user.save();
-		res.status(204);
+		const user = await User.findByIdAndUpdate(
+			req.user._id,
+			{ $pull: { wishlist: req.params.id } },
+			{ new: true } // Return the updated document
+		);
+		res.status(204).end();
 	} catch (err) {
 		res.status(400).json({ Error: "Request unsuccessful, try again!" });
 	}

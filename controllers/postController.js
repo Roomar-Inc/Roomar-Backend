@@ -5,7 +5,6 @@ const cloudinary = require("cloudinary").v2;
 const cloud = require("../config/cloudinaryConfig"); //import cloud config
 //const upload = require('../config/multerConfig')
 const searchPosts = require("../utils/query");
-const { regularPaginate, queryPaginate } = require("../utils/paginate");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
@@ -107,30 +106,45 @@ exports.getPost = async (req, res, next) => {
 //Get All Post Based on a User
 exports.getUserPosts = async (req, res, next) => {
 	try {
-		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 });
-		if (!docs) return res.status(404).json({ error: "No posts from this user" });
-		const [totalPostsCount, total_pages, page, posts] = await regularPaginate(req, res, docs);
+		const page = req.query.page * 1 || 1;
+		const limit = req.query.limit * 1 || 15;
+		const skip = (page - 1) * limit;
+		const total = await Post.countDocuments({ user_id: req.user._id });
+
+		let pages;
+		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
+
+		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
+
+		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+		if (!docs || !docs.length) return res.status(404).json({ error: "No posts from this user" });
 		res.status(200).json({
 			data: {
-				total_posts: totalPostsCount,
-				total_pages,
+				total,
+				pages,
 				page,
-				results: posts.length,
-				posts,
+				docs,
 			},
 		});
 	} catch (err) {
-		res.status(404).json({ error: "Error retrieving posts. Try again!" });
+		return res.status(404).json({ error: "Error retrieving posts. Try again!" });
 	}
 };
 
 exports.getAllPosts = async (req, res, next) => {
 	try {
-		//Filtering
-		//type-
-		//location
-		//status
-		//price
+		//Filter by type,location, status, price
+		const page = parseInt(req.query.page) * 1 || 1;
+		const limit = req.query.limit * 1 || 15;
+		const skip = (page - 1) * limit;
+		const total = await Post.countDocuments(queryObj);
+
+		let pages;
+		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
+
+		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
+
 		const queryObj = { ...req.query };
 		const excludedFields = ["page", "sort", "limit", "fields"];
 		excludedFields.forEach((el) => delete queryObj[el]);
@@ -139,23 +153,23 @@ exports.getAllPosts = async (req, res, next) => {
 
 		//Checks if there are filter fields
 		if (Object.keys(queryObj).length > 0) {
-			query = Post.find(queryObj).sort({ createdAt: -1 });
+			query = Post.find(queryObj).sort({ createdAt: -1 }).skip(skip).limit(limit);
 		} else {
-			query = Post.find().sort({ createdAt: -1 });
+			query = Post.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
 		}
 
 		if (req.query.page === 0 || req.query.page < 0) {
 			return res.status(404).json({ Error: "Not a vaild page range" });
 		}
-		const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
+		//const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
 
+		//pagination
 		res.status(200).json({
 			data: {
-				total_posts: totalPostsCount,
-				total_pages,
+				total,
+				pages,
 				page,
-				results: posts.length,
-				posts,
+				docs,
 			},
 		});
 	} catch (err) {
@@ -169,13 +183,23 @@ exports.search = async (req, res, next) => {
 		const { s } = req.query;
 		const items = await searchPosts(DB, s); //atlas search
 		if (!items) return res.status(404).json({ message: "No Posts" });
-		const [totalPostsCount, total_pages, page, posts] = await regularPaginate(req, res, items); //paginate data
+
+		const limit = 15;
+		const page = parseInt(req.query.page) || 1;
+		const firstEl = (page - 1) * limit; //0, 15, 30, 45,
+		const lastEl = page * limit; // 15, 30, 45, 60
+		const posts = items.slice(firstEl, lastEl);
+		const total = items.length;
+		let pages;
+		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
+		if (firstEl >= total) {
+			return res.status(400).json({ Error: "This page does not exist" });
+		}
 		res.status(200).json({
 			data: {
-				total_posts: totalPostsCount,
-				total_pages,
+				total,
+				pages,
 				page,
-				results: posts.length,
 				posts,
 			},
 		});
