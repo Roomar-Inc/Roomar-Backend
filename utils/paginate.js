@@ -1,6 +1,5 @@
 const Post = require("../models/postModel");
-
-async function regularPaginate(req, res, arr) {
+function regularPaginate(req, res, arr) {
 	try {
 		const itemsPerPage = 15;
 		const page = parseInt(req.query.page) || 1;
@@ -13,11 +12,12 @@ async function regularPaginate(req, res, arr) {
 			total_pages = 1;
 		} else total_pages = Math.ceil(totalPostsCount / itemsPerPage);
 		if (firstEl >= totalPostsCount) {
-			return res.status(400).json({ Error: "This page does not exist " });
+			return res.status(400).json({ Error: "This page does not exist" });
 		}
-		return [totalPostsCount, total_pages, page, posts];
+		console.log(totalPostsCount);
+		return { totalPostsCount, total_pages, page, posts };
 	} catch (err) {
-		return res.status(500).json({ Error: "Try again, pagination not working" });
+		res.status(500).json({ Error: "Try again, pagination not working" });
 	}
 }
 
