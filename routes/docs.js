@@ -8,6 +8,7 @@
  *         - user_id
  *         - name
  *         - address
+ *         - town
  *         - price
  *         - type
  *         - contact

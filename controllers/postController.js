@@ -117,7 +117,7 @@ exports.getUserPosts = async (req, res, next) => {
 		let pages;
 		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
 
-		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
+		if (skip > total) return res.status(400).json({ Error: "This page does not exist" });
 
 		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
