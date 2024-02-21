@@ -10,9 +10,10 @@ exports.createPost = async (req, res, next) => {
 		cloud(); //call the cloudinary config
 		const { name, address, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
-		if (!req.files || req.files.length === 0) {
-			return res.status(400).json({ error: "No images uploaded" });
-		}
+		console.log(req.files);
+		// if (!req.files || req.files.length === 0) {
+		// 	return res.status(400).json({ error: "No images uploaded" });
+		// }
 
 		const uploads = req.files.map(async (file) => {
 			const compressedBuffer = await sharp(file.buffer).webp().resize(450, 450, "contain").webp({ compressionLevel: 9 }).toBuffer();
@@ -161,7 +162,6 @@ exports.getAllPosts = async (req, res, next) => {
 		if (req.query.page === 0 || req.query.page < 0) {
 			return res.status(404).json({ Error: "Not a vaild page range" });
 		}
-		//const [totalPostsCount, total_pages, page, posts] = await queryPaginate(req, res, queryObj, query);
 
 		//pagination
 		res.status(200).json({
