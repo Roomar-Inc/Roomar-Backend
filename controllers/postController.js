@@ -10,6 +10,7 @@ exports.createPost = async (req, res, next) => {
 		cloud(); //call the cloudinary config
 		const { name, address, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
+		console.log(req.body);
 		console.log(req.files);
 		// if (!req.files || req.files.length === 0) {
 		// 	return res.status(400).json({ error: "No images uploaded" });
