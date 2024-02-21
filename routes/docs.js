@@ -21,6 +21,9 @@
  *         address:
  *           type: string
  *           description: Place where property is located
+ *         town:
+ *           type: string
+ *           description: Exact community/village where property is located eg. Eziobodo, Umuchima
  *         description:
  *           type: string
  *           description: Extra details about the property
@@ -131,6 +134,7 @@
  *               user_id: 65ce1a4706af50797f434380
  *               name: Kwechiri Lodge
  *               address: Behind Three Trees, opposite Adanna
+ *               town: Eziobodo
  *               contact: 09123748923
  *               description: Clean but with troublesome caretaker
  *               price: 150000

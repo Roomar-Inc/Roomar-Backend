@@ -14,6 +14,10 @@ const postSchema = new mongoose.Schema(
 			type: String,
 			required: [true, "Please provide property address"],
 		},
+		town: {
+			type: String,
+			required: [true, "Please specify location of the property "],
+		},
 		contact: {
 			type: String,
 			required: [true, "Please provide contact"],

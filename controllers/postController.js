@@ -8,7 +8,7 @@ const searchPosts = require("../utils/query");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
-		const { name, address, description, price, room_number, type, status, contact } = req.body;
+		const { name, address, town, description, price, room_number, type, contact } = req.body;
 		const image = req.files;
 		console.log(req.body);
 		console.log(req.files);
@@ -29,6 +29,7 @@ exports.createPost = async (req, res, next) => {
 			user_id: req.user._id,
 			name,
 			address,
+			town,
 			contact,
 			description,
 			price,
