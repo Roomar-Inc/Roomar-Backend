@@ -8,13 +8,11 @@ const searchPosts = require("../utils/query");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
-		const { name, address, town, description, price, room_number, type, contact } = req.body;
+		const { name, address, town, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
-		console.log(req.body);
-		console.log(req.files);
-		// if (!req.files || req.files.length === 0) {
-		// 	return res.status(400).json({ error: "No images uploaded" });
-		// }
+		if (!req.files || req.files.length === 0) {
+			return res.status(400).json({ error: "No images uploaded" });
+		}
 
 		const uploads = req.files.map(async (file) => {
 			const compressedBuffer = await sharp(file.buffer).webp().resize(450, 450, "contain").webp({ compressionLevel: 9 }).toBuffer();
@@ -34,6 +32,7 @@ exports.createPost = async (req, res, next) => {
 			description,
 			price,
 			room_number,
+			status,
 			type,
 			photos: links,
 		});
