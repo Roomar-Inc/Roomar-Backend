@@ -24,7 +24,7 @@
  *           description: Place where property is located
  *         town:
  *           type: string
- *           description: Exact community/village where property is located eg. Eziobodo, Umuchima
+ *           description: Exact community/village where property is located eg. Eziobodo Umuchima
  *         description:
  *           type: string
  *           description: Extra details about the property
@@ -39,7 +39,7 @@
  *           description: Max of 7
  *         type:
  *           type: string
- *           enum: [furnished, unfurnished]
+ *           enum: [furnished unfurnished]
  *           default: unfurnished
  *           description: Choose between furnished or unfurnished
  *         contact: 
@@ -47,7 +47,7 @@
  *           description: leaser's/Seller's contact
  *         status:
  *           type: string
- *           enum: [available, unavailable]
+ *           enum: [available unavailable]
  *           default: 'available'
  *           description: Choose between Available and Unavailable
 
@@ -70,10 +70,10 @@
  *             type: string
  *          role:
  *             type: string
- *             enum: [owner, seeker]
+ *             enum: [owner seeker]
  *          gender:
  *             type: string
- *             enum: [male, female]
+ *             enum: [male female]
  *          photo:
  *             type: string
  *          password:
@@ -85,7 +85,7 @@
  * /:
  *   get:
  *    summary: Retrieve all Posts from DB
- *    description: Paginated, returns 15 posts per page, add the page no. to the query params **i.e /?page=3**. Without specifying page or even page 1, it outputs the first 15 elements in the db
+ *    description: Paginated returns 15 posts per page add the page no. to the query params **i.e /?page=3**. Without specifying page or even page 1 it outputs the first 15 elements in the db
  *    tags: [Posts]
  *    parameters:
  *       - in: query
@@ -99,18 +99,17 @@
  *        content:
  *          application/json:
  *            example:
- *              total_posts: 55
- *              total_pages: 4
+ *              total: 55
+ *              pages: 4
  *              page: 1
- *              results: 15
  *              posts:
  *                 _id: 65bfa0026fa212499ec8628b
  *                 user_id: 65be5b7d5bcc186da231999f
  *                 name: Akusom Lodge
- *                 address: Behind Three Threes, Opposite Adanna
+ *                 address: Behind Three Threes Opposite Adanna
  *                 location: Eziobodo
  *                 description: Clean but with troublesome caretaker
- *                 price: 150,000
+ *                 price: 150000
  *                 type: Unfurnished
  *                 status: Available
  *                 photos: []
@@ -134,7 +133,7 @@
  *              post:
  *               user_id: 65ce1a4706af50797f434380
  *               name: Kwechiri Lodge
- *               address: Behind Three Trees, opposite Adanna
+ *               address: Behind Three Trees opposite Adanna
  *               town: Eziobodo
  *               contact: 09123748923
  *               description: Clean but with troublesome caretaker
@@ -149,7 +148,7 @@
  * /search:
  *   get:
  *    summary: Search by name
- *    description: search based on given expression paginated to 15 per page, takes in the search expression with parameter s, **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry, apply **page** parameter, **i.e ?page=2**, but by default it returns the first page which must not be explicitly stated
+ *    description: search based on given expression paginated to 15 per page takes in the search expression with parameter s **i.e ?s=Akusom Lodge**. To further paginate the result based on your entry apply **page** parameter **i.e ?page=2** but by default it returns the first page which must not be explicitly stated
  *    tags: [Posts]
  *    responses:
  *       '200':
@@ -157,18 +156,17 @@
  *        content:
  *          application/json:
  *            example:
- *              total_posts: 3
- *              total_pages: 1
+ *              total: 3
+ *              pages: 1
  *              page: 1
- *              results: 3
  *              posts:
  *                 _id: 65bfa0026fa212499ec8628b
  *                 user_id: 65be5b7d5bcc186da231999f
  *                 name: Akusom Lodge
- *                 address: Behind Three Threes, Opposite Adanna
+ *                 address: Behind Three Threes Opposite Adanna
  *                 location: Eziobodo
  *                 description: Clean but with troublesome caretaker
- *                 price: 150,000
+ *                 price: 150000
  *                 type: Unfurnished
  *                 status: Available
  *                 photos: []
@@ -195,14 +193,85 @@
  * /posts:
  *   get:
  *      summary: Get posts
- *      description: Get all posts of the authenticated user, paginated and sorted 
+ *      description: Get all posts of the authenticated user paginated and sorted 
  *      tags: [Posts]
- *
+ * 
+ * /profile:
+ *   get: 
+ *      summary: Get Profile
+ *      description: Get profile information 
+ *      tags: [Profile]
+ *      responses:
+ *       '200':
+ *        description: Search successfully
+ *        content:
+ *          application/json:
+ *            example:
+ *              _id: 65d62a85985343ed47caae69
+ *              name: CHikobi
+ *              username: Jimalusun
+ *              email: whistler@gmail.com
+ *              role: seeker
+ *              phone: 091332891232
+ *              wishlist: []
+ *              passwordChangedAt: 2024-02-21T16:53:25.178Z
+ *              createdAt: 2024-02-21T16:53:30.749Z
+ *              updatedAt: 2024-02-22T12:58:34.648Z
+ * 
+ *   patch: 
+ *      summary: Update Profile
+ *      description: Email Password and Role cannot be updated via this route 
+ *      tags: [Profile]
+ *      responses:
+ *       '200':
+ *        description: Update successful
+ *        content:
+ *          application/json:
+ *            example:
+ *              _id: 65d62a85985343ed47caae69
+ *              name: David
+ *              username: Jimalusun
+ *              email: whistler@gmail.com
+ *              role: seeker
+ *              phone: 091332891232
+ *              wishlist: []
+ *              passwordChangedAt: 2024-02-21T16:53:25.178Z
+ *              createdAt: 2024-02-21T16:53:30.749Z
+ *              updatedAt: 2024-02-22T12:58:34.648Z
+ * 
+ * /wishlist:
+ *   get:
+ *      summary: View wishlist
+ *      description: Get items in wishlist
+ *      tags: [Profile]
+ *      responses:
+ *       '200':
+ *        description: Successful
+ *        content:
+ *          application/json:
+ *            example:
+ *               total: 3
+ *               pages: 1
+ *               page: 1
+ *               posts: 
+ *                 _id: 65bfa2e2f91b5bd8131f05a2
+ *                 user_id: 65be5b7d5bcc186da231999f
+ *                 name: Akusom Lodge
+ *                 address: Behind Three Trees opposite Adanna
+ *                 description: Clean but with troublesome caretaker
+ *                 price: 150000
+ *                 type: Unfurnished
+ *                 status: Available
+ *                 photos:
+ *                    http://res.cloudinary.com/dufy5hiis/image/upload/v1707057893/nurhquqmhjsajlbhxfwp.webp
+ *                    http://res.cloudinary.com/dufy5hiis/image/upload/v1707057893/eqvkswuqwjwroj1xcaea.webp
+                  
+ *  
  * /wishlist/{post_id}:
  *   patch:
  *      summary: Add post to wishlist
  *      description: Send post id as request param
- *      tags: [Posts]
+ *      tags: [Profile]
  *      responses:
  *       '201':
  *        description: Added Successfully
@@ -214,10 +283,12 @@
  *   delete:
  *      summary: Delete from wishlist
  *      description: Send post id as request param
- *      tags: [Posts]
+ *      tags: [Profile]
  *      responses:
  *        '204':
  *          description: Deleted successfully
+ *          application/json:
+ *            example:
  *
  * /signup:
  *   post:
@@ -251,7 +322,7 @@
  *               updatedAt: 2024-02
  *
  *       '400':
- *        description: Unsuccesful attempt, check the returned response object for the error in particular. Most probably ommiting required field or wrong key, value format.
+ *        description: Unsuccesful attempt check the returned response object for the error in particular. Most probably ommiting required field or wrong key value format.
  *        content:
  *          application/json:
  *           examples:
@@ -264,7 +335,7 @@
  *              summary:
  *              value:
  *                name: ValidatorError
- *                message: Error, expected username to be unique. Value johnhouses
+ *                message: Error expected username to be unique. Value johnhouses
  *
  * /login:
  *   post:
@@ -344,7 +415,7 @@
  *      summary: Confirms OTP
  *      description: >
  *        Step 2/3
- *        Verifies OTP, if successful sends out a JWT Reset Token as part of the response
+ *        Verifies OTP if successful sends out a JWT Reset Token as part of the response
  *      tags: [Auth]
  *      requestBody:
  *       required: true
@@ -370,7 +441,7 @@
  *      summary: Update Password
  *      description: >
  *        Step 3/3
- *        Takes in Reset Token from the **verifyOTP** route alongside the new password choice which should log the user in, if successful. Anyway you can store the reset token from the last response and send alongside thiis request
+ *        Takes in Reset Token from the **verifyOTP** route alongside the new password choice which should log the user in if successful. Anyway you can store the reset token from the last response and send alongside thiis request
  *      tags: [Auth]
  *      requestBody:
  *       required: true
