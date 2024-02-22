@@ -116,31 +116,6 @@ exports.login = async (req, res, next) => {
 	}
 };
 
-exports.changePassword = async (req, res, next) => {
-	// 1) Get user from collection
-	try {
-		const user = await User.findById(req.user._id).select("+password");
-		//console.log(user);
-		//2) Check if POSTed current password is correct
-		if (!(await user.correctPassword(req.body.current_password, user.password))) {
-			return res.status(401).json({
-				status: "fail",
-				message: "Your current password is wrong",
-			});
-		}
-		//3) If so, update Password
-		user.password = req.body.new_password;
-		user.passwordChangedAt = Date.now();
-		await user.save();
-		res.status(200).json({ message: "Password successfully changed" });
-	} catch (err) {
-		return res.status(401).json({
-			status: "fail",
-			message: err,
-		});
-	}
-};
-
 exports.restrictTo = (...roles) => {
 	try {
 		return (req, res, next) => {
@@ -248,30 +223,5 @@ exports.resetPassword = async (req, res, next) => {
 		user.otpJwt = undefined;
 		user.otpJwtExpires = undefined;
 		res.status(400).json(err);
-	}
-};
-
-exports.getProfile = async (req, res, next) => {
-	try {
-		const user = req.user;
-		res.status(200).json(user);
-	} catch (err) {
-		res.status(404).json({ message: err });
-	}
-};
-
-exports.updateProfile = async (req, res, next) => {
-	try {
-		if (req.body.password || req.body.email || req.body.role) {
-			return res.status(400).json("Fields can't be updated via this route");
-		}
-
-		const user = await User.findByIdAndUpdate(req.user._id, req.body, {
-			new: true,
-			runValidators: true,
-		});
-		res.status(200).json(user);
-	} catch (err) {
-		res.status(404).json({ message: err });
 	}
 };

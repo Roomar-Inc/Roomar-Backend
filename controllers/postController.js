@@ -8,7 +8,7 @@ const searchPosts = require("../utils/query");
 exports.createPost = async (req, res, next) => {
 	try {
 		cloud(); //call the cloudinary config
-		const { name, address, description, price, room_number, type, status, contact } = req.body;
+		const { name, address, town, description, price, room_number, type, status, contact } = req.body;
 		const image = req.files;
 		console.log(req.files);
 		// if (!req.files || req.files.length === 0) {
@@ -20,7 +20,7 @@ exports.createPost = async (req, res, next) => {
 			const base64EncodedImage = compressedBuffer.toString("base64");
 			const dataUri = `data:image/webp;base64,${base64EncodedImage}`;
 			const response = await cloudinary.uploader.upload(dataUri);
-			return response.url; // Modify the response object if needed
+			return response.url;
 		});
 
 		const links = await Promise.all(uploads);
@@ -28,10 +28,12 @@ exports.createPost = async (req, res, next) => {
 			user_id: req.user._id,
 			name,
 			address,
+			town,
 			contact,
 			description,
 			price,
 			room_number,
+			status,
 			type,
 			photos: links,
 		});
@@ -107,6 +109,10 @@ exports.getPost = async (req, res, next) => {
 //Get All Post Based on a User
 exports.getUserPosts = async (req, res, next) => {
 	try {
+		if (req.query.page === 0 || req.query.page < 0) {
+			return res.status(400).json({ Error: "Not a vaild page range" });
+		}
+
 		const page = req.query.page * 1 || 1;
 		const limit = req.query.limit * 1 || 15;
 		const skip = (page - 1) * limit;
@@ -115,17 +121,17 @@ exports.getUserPosts = async (req, res, next) => {
 		let pages;
 		total !== 0 && limit > total ? (pages = 1) : (pages = Math.ceil(total / limit));
 
-		if (skip >= total) return res.status(404).json({ Error: "This page does not exist" });
+		if (skip > total) return res.status(400).json({ Error: "This page does not exist" });
 
-		const docs = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+		const posts = await Post.find({ user_id: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
-		if (!docs || !docs.length) return res.status(404).json({ error: "No posts from this user" });
+		if (!posts || !posts.length) return res.status(404).json({ error: "No posts from this user" });
 		res.status(200).json({
 			data: {
 				total,
 				pages,
 				page,
-				docs,
+				posts,
 			},
 		});
 	} catch (err) {
@@ -136,6 +142,11 @@ exports.getUserPosts = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
 	try {
 		//Filter by type,location, status, price
+
+		if (req.query.page === 0 || req.query.page < 0) {
+			return res.status(400).json({ Error: "Not a vaild page range" });
+		}
+
 		const page = parseInt(req.query.page) * 1 || 1;
 		const limit = req.query.limit * 1 || 15;
 		const skip = (page - 1) * limit;
@@ -159,9 +170,7 @@ exports.getAllPosts = async (req, res, next) => {
 			query = Post.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
 		}
 
-		if (req.query.page === 0 || req.query.page < 0) {
-			return res.status(404).json({ Error: "Not a vaild page range" });
-		}
+		const posts = await query;
 
 		//pagination
 		res.status(200).json({
@@ -169,7 +178,7 @@ exports.getAllPosts = async (req, res, next) => {
 				total,
 				pages,
 				page,
-				docs,
+				posts,
 			},
 		});
 	} catch (err) {
@@ -183,6 +192,10 @@ exports.search = async (req, res, next) => {
 		const { s } = req.query;
 		const items = await searchPosts(DB, s); //atlas search
 		if (!items) return res.status(404).json({ message: "No Posts" });
+
+		if (req.query.page === 0 || req.query.page < 0) {
+			return res.status(400).json({ Error: "Not a vaild page range" });
+		}
 
 		const limit = 15;
 		const page = parseInt(req.query.page) || 1;
