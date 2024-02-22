@@ -41,12 +41,10 @@ exports.viewWishlist = async (req, res, next) => {
 			.limit(limit);
 
 		res.status(200).json({
-			data: {
-				total,
-				pages,
-				page,
-				posts,
-			},
+			total,
+			pages,
+			page,
+			posts,
 		});
 	} catch (err) {
 		res.status(500).json({ Error: "Error fetching wishlist" });

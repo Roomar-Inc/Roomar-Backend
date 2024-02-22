@@ -38,9 +38,7 @@ exports.createPost = async (req, res, next) => {
 			photos: links,
 		});
 		return res.status(201).json({
-			data: {
-				post,
-			},
+			post,
 		});
 	} catch (err) {
 		return res.status(400).json({ Error: err });
@@ -127,12 +125,10 @@ exports.getUserPosts = async (req, res, next) => {
 
 		if (!posts || !posts.length) return res.status(404).json({ error: "No posts from this user" });
 		res.status(200).json({
-			data: {
-				total,
-				pages,
-				page,
-				posts,
-			},
+			total,
+			pages,
+			page,
+			posts,
 		});
 	} catch (err) {
 		return res.status(404).json({ error: "Error retrieving posts. Try again!" });
@@ -174,12 +170,10 @@ exports.getAllPosts = async (req, res, next) => {
 
 		//pagination
 		res.status(200).json({
-			data: {
-				total,
-				pages,
-				page,
-				posts,
-			},
+			total,
+			pages,
+			page,
+			posts,
 		});
 	} catch (err) {
 		res.status(404).json({ error: "Post not found", err });
@@ -209,12 +203,10 @@ exports.search = async (req, res, next) => {
 			return res.status(400).json({ Error: "This page does not exist" });
 		}
 		res.status(200).json({
-			data: {
-				total,
-				pages,
-				page,
-				posts,
-			},
+			total,
+			pages,
+			page,
+			posts,
 		});
 	} catch (err) {
 		res.status(404).json({ Error: "Item not found" });

@@ -16,10 +16,8 @@ const createAndSendToken = (user, statusCode, res, text) => {
 	user.password = undefined;
 	res.header("Authorization", `Bearer ${token}`);
 	res.status(statusCode).json({
-		data: {
-			token,
-			user,
-		},
+		token,
+		user,
 	});
 };
 
