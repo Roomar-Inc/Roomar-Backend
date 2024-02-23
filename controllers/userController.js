@@ -117,3 +117,27 @@ exports.changePassword = async (req, res, next) => {
 		});
 	}
 };
+
+exports.totalAnalytics = async (req, res, next) => {
+	//Get id of the user
+	//Get all users post and and return all viewed by fields
+	const posts = await Post.find({ _id: { $in: postIds } });
+	//Or return the count of all fields
+	//or return each post and the number of clicks
+};
+
+exports.postAnalytics = async (req, res, next) => {
+	//Get Id from the request
+	//Get the length of the viewedBy field and return it
+	// try {
+	const { user_id, viewedBy } = await Post.findById(req.params.id, { viewedBy: 1, user_id: 1 });
+	if (req.user._id !== user_id) return res.status(403).json({ message: "You do not own this post" });
+	if (!viewedBy) return res.status(404).json({ message: "No clicks recorded for this post" });
+	const clicks = viewedBy.length;
+	res.status(200).json({
+		clicks,
+	});
+	// } catch (err) {
+	// 	res.status(400).json({ Error: "Unable to retrieve analytics, try again!" });
+	// }
+};

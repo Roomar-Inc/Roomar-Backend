@@ -31,8 +31,8 @@
  *         price:
  *           type: number
  *           description: Price of the property
- *         room_no:
- *           type: number
+ *         room_number:
+ *           type: string
  *           description: Room Number
  *         photos:
  *           type: array

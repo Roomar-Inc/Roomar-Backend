@@ -25,6 +25,9 @@ const postSchema = new mongoose.Schema(
 		description: {
 			type: String,
 		},
+		room_number: {
+			type: String,
+		},
 		price: {
 			type: Number,
 			required: [true, "Please provide price"],
@@ -44,6 +47,9 @@ const postSchema = new mongoose.Schema(
 			required: [true, "Upload photos of your property"],
 			//max of 10
 			//add an alt to an image
+		},
+		viewedBy: {
+			type: Array,
 		},
 	},
 	{
