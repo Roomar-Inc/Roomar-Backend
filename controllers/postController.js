@@ -96,8 +96,14 @@ exports.updatePost = async (req, res) => {
 };
 //Get Single Post
 exports.getPost = async (req, res, next) => {
+	//Create a value in the post schema to hold no. of times viewed
+	//Check if the user.id exists if not add to the list of values in the schema
+	//Return the count of that particular field
 	try {
-		const post = await Post.findById(req.params.id);
+		const post = await Post.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { viewedBy: req.user._id } }, { new: true, upsert: false });
+
+		// const post = await Post.findById(req.params.id);
+		// const viewedBy = await User.findByIdAndUpdate(req.params.id, { $addToSet: { viewedBy: req.user._id } }, { new: true });
 		res.status(200).json(post);
 	} catch (err) {
 		res.status(404).json({ error: "Post not found" });
